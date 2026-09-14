@@ -1,12 +1,12 @@
 import React from 'react';
 import { FileSpreadsheet, ExternalLink, LogOut, Settings, Users, FileText } from 'lucide-react';
-import { User as FirebaseUser } from 'firebase/auth';
+import { GoogleUser } from '../services/googleAuth';
 import { SpreadsheetInfo } from '../types/customer';
 
 export type TabKey = 'customers' | 'quotes';
 
 interface NavbarProps {
-  user: FirebaseUser | null;
+  user: GoogleUser | null;
   currentSpreadsheet: SpreadsheetInfo | null;
   onOpenSheetManager: () => void;
   onLogin: () => void;
@@ -68,20 +68,20 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center gap-3 sm:gap-4 text-sm">
             {user ? (
               <div className="flex items-center gap-2 bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md">
-                {user.photoURL ? (
+                {user.picture ? (
                   <img
-                    src={user.photoURL}
-                    alt={user.displayName || 'User'}
+                    src={user.picture}
+                    alt={user.name || 'User'}
                     className="w-6 h-6 rounded-full border border-blue-400"
                     referrerPolicy="no-referrer"
                   />
                 ) : (
                   <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-[10px] font-bold text-white">
-                    {user.displayName?.charAt(0) || 'U'}
+                    {user.name?.charAt(0) || 'U'}
                   </div>
                 )}
                 <p className="hidden md:block text-xs font-medium text-white truncate max-w-[100px]">
-                  {user.displayName || 'ユーザー'}
+                  {user.name || 'ユーザー'}
                 </p>
                 <button
                   onClick={onLogout}

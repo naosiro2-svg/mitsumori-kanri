@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User as FirebaseUser } from 'firebase/auth';
-import { initAuth, googleSignIn, logout } from './services/firebaseAuth';
+import { GoogleUser, googleSignIn, logout } from './services/googleAuth';
 import { Customer, Quote, SpreadsheetInfo } from './types/customer';
 import {
   fetchCustomersFromSheet,
@@ -23,7 +22,7 @@ const LOCAL_STORAGE_QUOTES_KEY = 'mitsumori_quotes_v1';
 const LOCAL_STORAGE_ACTIVE_SHEET_KEY = 'mitsumori_active_sheet_v1';
 
 export default function App() {
-  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [user, setUser] = useState<GoogleUser | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<TabKey>('customers');
@@ -101,20 +100,6 @@ export default function App() {
     }
   }, [currentSpreadsheet]);
 
-  useEffect(() => {
-    const unsubscribe = initAuth(
-      (authUser, token) => {
-        setUser(authUser);
-        setAccessToken(token);
-      },
-      () => {
-        setUser(null);
-        setAccessToken(null);
-      }
-    );
-    return () => unsubscribe();
-  }, []);
-
   const showNotification = (message: string, type: 'success' | 'info' | 'error' = 'success') => {
     setStatusNotification({ type, message });
     setTimeout(() => setStatusNotification(null), 4000);
@@ -123,21 +108,19 @@ export default function App() {
   const handleLogin = async () => {
     try {
       const result = await googleSignIn();
-      if (result) {
-        setUser(result.user);
-        setAccessToken(result.accessToken);
-        showNotification(`Googleアカウント「${result.user.displayName || result.user.email}」でログインしました`, 'success');
-        if (!currentSpreadsheet) {
-          setIsSheetManagerOpen(true);
-        }
+      setUser(result.user);
+      setAccessToken(result.accessToken);
+      showNotification(`Googleアカウント「${result.user.name || result.user.email}」でログインしました`, 'success');
+      if (!currentSpreadsheet) {
+        setIsSheetManagerOpen(true);
       }
     } catch (err: any) {
       showNotification(err.message || 'Googleログインに失敗しました', 'error');
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
+  const handleLogout = () => {
+    logout();
     setUser(null);
     setAccessToken(null);
     showNotification('ログアウトしました', 'info');
