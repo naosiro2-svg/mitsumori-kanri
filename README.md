@@ -52,3 +52,18 @@ http://localhost:3000 でアプリが起動します。
 
 - **顧客データ**シート: 顧客ID, 会社名, 担当者名, 電話番号, メールアドレス, 住所, 備考, 登録日時
 - **見積り明細データ**シート: 見積り番号, 顧客ID, 顧客名, 発行日, 有効期限, 明細番号, 品目名, 数量, 単位, 単価, 金額, 小計, 消費税額, 合計金額, 備考, 登録日時, 見積りID
+
+## GitHub Pagesへの公開（ローカルでnpm run devを使わずにブラウザだけでテストしたい場合）
+
+このリポジトリには `.github/workflows/deploy.yml` が入っており、`main` ブランチにpushするたびに自動でGitHub Pagesにビルド・公開されます。
+
+### 初回だけ必要な設定
+
+1. GitHubのリポジトリ画面 →「Settings」→「Pages」→「Build and deployment」の「Source」を **GitHub Actions** に変更
+2. リポジトリの「Settings」→「Secrets and variables」→「Actions」→「New repository secret」で、
+   - Name: `VITE_GOOGLE_CLIENT_ID`
+   - Value: Google Cloudで発行したクライアントID
+   を登録
+3. Google CloudのOAuthクライアント設定に戻り、「承認済みのJavaScript生成元」に公開後のURL（例: `https://naosiro2-svg.github.io`）を追加
+
+設定後、`main` にpushすると数分で `https://naosiro2-svg.github.io/mitsumori-kanri/` に公開されます。以降はこのURLをブラウザで開くだけで、インストールや`npm run dev`なしにアプリを使えます。
